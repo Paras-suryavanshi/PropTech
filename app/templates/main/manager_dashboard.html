@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager Dashboard</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px;}
+        .container { max-width: 800px; margin: 0 auto; padding-bottom: 30px;}
+        header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h1, h2 { color: #333; margin: 0; font-size: 20px;}
+        .btn-logout { background: #dc3545; color: white; padding: 14px 10px; text-decoration: none; border-radius: 10px; }
+        
+        /* Card Styling */
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 4px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #f8f9fa; }
+        
+        .btn-approve { background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
+        .btn-approve:hover { background: #218838; }
+        .badge { padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; color: green;}
+        .role-tenant { background: #e0f7fa; color: #00838f; }
+        .role-tech { background: #fff3e0; color: #e65100; }
+        
+        .flash-messages { color: green; margin-bottom: 15px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>PropTech Manager</h1>
+        <div style="display: flex; gap: 10px;">
+            <a href="{{ url_for('main.profile') }}" style="background: #54a1ef; color: #333; padding: 8px 12px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 14px; margin-left: 5px;">My Profile</a>
+            <a href="{{ url_for('auth.logout') }}" class="btn-logout">Logout</a>
+        </div>
+    </header>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for message in messages %} {{ message }} {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="card" style="margin-bottom: 20px; border-top: 5px solid #6f42c1; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        <h2 style="margin-top: 0; color: #333;">📢 Create Announcement</h2>
+        
+        <form action="{{ url_for('main.post_announcement') }}" method="POST" style="display: flex; flex-direction: column; gap: 12px; margin-top: 15px;">
+            <input type="text" name="title" placeholder="Announcement Title" required style="padding: 10px; border: 1px solid #ccc; border-radius: 4px; width: 100%; box-sizing: border-box;">
+            
+            <textarea name="message" placeholder="Type your message here..." required style="padding: 10px; border: 1px solid #ccc; border-radius: 4px; width: 100%; box-sizing: border-box; resize: vertical; height: 80px;"></textarea>
+            
+            <div style="display: flex; flex-direction: column; gap: 5px;">
+                <label for="target_role" style="font-size: 14px; font-weight: bold; color: #555;">Target Audience:</label>
+                <select name="target_role" id="target_role"required style="padding: 10px; border-radius: 4px; border: 1px solid #ccc; width: 100%; box-sizing: border-box;">
+                    <option value="all">Everyone (Tenants & Technicians)</option>
+                    <option value="tenant">Tenants Only</option>
+                    <option value="technician">Technicians Only</option>
+                </select>
+            </div>
+            
+            <button type="submit" style="background: #6f42c1; color: white; border: none; padding: 12px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; box-sizing: border-box;">Notify</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>Requires Approval</h2>
+        {% if pending_users %}
+            <table>
+                <tr>
+                    <th>Username</th>
+                    <th>Requested Role</th>
+                    <th>Action</th>
+                </tr>
+                {% for user in pending_users %}
+                <tr>
+                    <td>{{ user.username }}</td>
+                    <td><span class="badge role-{% if user.role == 'tenant' %}tenant{% else %}tech{% endif %}">{{ user.role | capitalize }}</span></td>
+                    <td>
+                        <form action="{{ url_for('main.approve_user', user_id=user.id) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn-approve">Approve User</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p style="color: #666; margin-top: 10px;">No pending users to approve. All caught up!</p>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h2>Active Maintenance Tickets</h2>
+        
+        {% if tickets %}
+            {% for ticket in tickets %}
+                <div class="ticket-card" style="border: 1px solid #ddd; padding: 15px; margin-top: 15px; border-radius: 6px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <strong>{{ ticket.title }}</strong>
+                        <span class="badge status-{{ ticket.status | replace(' ', '-') }}" style="background: #e9ecef; padding: 5px 10px; border-radius: 12px; font-size: 12px;">{{ ticket.status }}</span>
+                    </div>
+                    
+                    <p style="font-size: 13px; color: #555; margin: 5px 0;">
+                        <strong>Reported by:</strong> {{ ticket.tenant.full_name }} <br>
+                        <strong>Date:</strong> {{ ticket.created_at.strftime('%Y-%m-%d %H:%M') }}
+                    </p>
+                    <p style="background: #f8f9fa; padding: 10px; border-radius: 4px; font-size: 14px;">{{ ticket.description }}</p>
+
+                    {% if ticket.image_filename %}
+                        <div style="margin: 10px 0;">
+                            <p style="font-size: 12px; font-weight: bold; color: #666; margin-bottom: 5px;">Attached Photo:</p>
+                            <img src="{{ url_for('static', filename='uploads/' + ticket.image_filename) }}" alt="Issue Image" style="max-width: 100%; height: auto; max-height: 200px; border-radius: 4px; border: 1px solid #ccc;">
+                        </div>
+                    {% endif %}
+
+                    <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+
+                    {% if ticket.status == 'Open' %}
+                        <form action="{{ url_for('main.assign_ticket', ticket_id=ticket.id) }}" method="POST" style="display: flex; flex-direction: column; gap: 12px;">
+    
+                            <div style="display: flex; flex-direction: column; gap: 5px;">
+                                <label for="tech_{{ ticket.id }}" style="font-size: 14px; font-weight: bold;">Assign To:</label>
+                                <select name="technician_id" id="tech_{{ ticket.id }}" required style="padding: 10px; border-radius: 4px; border: 1px solid #ccc; width: 100%;">
+                                    <option value="" disabled selected>Select a Technician...</option>
+                                    {% for tech in technicians %}
+                                        <option value="{{ tech.id }}">{{ tech.full_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <button type="submit" style="background: #007bff; color: white; border: none; padding: 12px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%;">Assign Job</button>
+                            
+                        </form>
+                    {% else %}
+                        <p style="font-size: 14px; color: #28a745; margin: 0; font-weight: bold;">
+                            ✓ Assigned to: {{ ticket.technician.full_name }}
+                        </p>
+                    {% endif %}
+
+                    <div style="margin-top: 20px; background: #f8f9fa; padding: 15px; border-radius: 6px;">
+                        <h4 style="margin: 0 0 15px 0; color: #333; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Ticket History</h4>
+                        
+                        <div style="border-left: 2px solid #ccc; padding-left: 15px; margin-left: 5px;">
+                            
+                            {% for log in ticket.logs|sort(attribute='timestamp') %}
+                                <div style="margin-bottom: 12px; position: relative;">
+                                    <span style="position: absolute; left: -21px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #007bff; border: 2px solid #f8f9fa;"></span>
+                                    
+                                    <div style="font-size: 11px; color: #888; font-weight: bold;">{{ log.timestamp.strftime('%B %d, %I:%M %p') }}</div>
+                                    <div style="font-size: 13px; color: #333;">{{ log.action }}</div>
+                                </div>
+                            {% endfor %}
+                            
+                        </div>
+                    </div>
+
+                </div>
+            {% endfor %}
+        {% else %}
+            <p style="color: #666;">No tickets submitted yet.</p>
+        {% endif %}
+    </div>
+    <div class="card" style="margin-top: 20px;">
+        <h2>Technician Directory</h2>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+            <tr style="background-color: #f8f9fa;">
+                <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Name</th>
+                <th style="padding: 5px; text-align: left; border-bottom: 2px solid #ddd;">Contact Info</th>
+            </tr>
+            {% for tech in technicians %}
+            <tr>
+                <td style="padding: 12px; border-bottom: 1px solid #eee;"><strong>{{ tech.full_name }}</strong></td>
+                <td style="padding: 5px; border-bottom: 1px solid #eee; font-size: 14px; color: #555;">
+                    📧 {{ tech.email }} <br>
+                    📞 {{ tech.phone_number }}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="2" style="padding: 12px; text-align: center; color: #666;">No approved technicians available.</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+</div>
+
+</body>
+</html>

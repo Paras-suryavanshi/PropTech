@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technician Dashboard</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; margin: 0; padding: 15px; }
+        .container { max-width: 600px; margin: auto; } /* Narrower for mobile feel */
+        header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h1, h2 { color: #333; margin: 0; font-size: 20px; }
+        .btn-logout { background: #dc3545; color: white; padding: 14px 10px; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 14px; }
+        
+        .job-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; border-top: 5px solid #007bff; }
+        .job-card.status-Done { border-top-color: #28a745; opacity: 0.8; }
+        
+        .badge { padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; background: #e9ecef; color: #333;}
+        .badge.In-Progress { background: #17a2b8; color: white; }
+        .badge.Done { background: #28a745; color: white; }
+        
+        .detail-row { margin-bottom: 8px; font-size: 14px; color: #555; }
+        .detail-row strong { color: #333; }
+        
+        .action-area { margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; display: flex; gap: 10px; }
+        .btn-action { flex: 1; padding: 10px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; color: white; }
+        .btn-progress { background-color: #17a2b8; }
+        .btn-done { background-color: #28a745; }
+        
+        .flash-messages { color: green; font-weight: bold; margin-bottom: 15px; text-align: center;}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Hey, {{ current_user.full_name }} 👋</h1>
+        <div style="display: flex; gap: 10px;">
+            <a href="{{ url_for('main.profile') }}" style="background: #54a1ef; color: #333; padding: 8px 15px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 14px;">My Profile</a>
+            <a href="{{ url_for('auth.logout') }}" class="btn-logout">Logout</a>
+        </div>
+    </header>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for message in messages %} {{ message }} {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% if announcements %}
+        <div style="margin-bottom: 25px;">
+            <h3 style="color: #6f42c1; font-size: 16px; margin-bottom: 10px; text-transform: uppercase;">📢 Important Updates</h3>
+            {% for ann in announcements %}
+                <div style="background: #e0d4f5; border-left: 4px solid #6f42c1; padding: 15px; border-radius: 4px; margin-bottom: 10px; color: #333;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                        <strong style="font-size: 16px;">{{ ann.title }}</strong>
+                        <span style="font-size: 12px; color: #666;">{{ ann.created_at.strftime('%B %d, %I:%M %p') }}</span>
+                    </div>
+                    <p style="margin: 0; font-size: 14px; line-height: 1.5;">{{ ann.message }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <h2 style="margin-bottom: 5px;">Your Assigned Jobs</h2>
+    
+    {% if tickets %}
+        {% for ticket in tickets %}
+            <div class="job-card status-{{ ticket.status | replace(' ', '-') }}">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px; align-items: center;">
+                    <strong style="font-size: 18px;">{{ ticket.title }}</strong>
+                    <span class="badge {{ ticket.status | replace(' ', '-') }}">{{ ticket.status }}</span>
+                </div>
+                
+                <div class="detail-row"><strong>Reported by:</strong> {{ ticket.tenant.full_name }}</div>
+                <div class="detail-row"><strong>Contact:</strong> {{ ticket.tenant.phone_number }}</div>
+                <div class="detail-row"><strong>Date:</strong> {{ ticket.created_at.strftime('%B %d, %H:%M') }}</div>
+                
+                <p style="background: #f8f9fa; padding: 12px; border-radius: 4px; font-size: 14px; line-height: 1.5;">{{ ticket.description }}</p>
+
+                {% if ticket.image_filename %}
+                    <div style="margin: 15px 0; text-align: center;">
+                        <img src="{{ url_for('static', filename='uploads/' + ticket.image_filename) }}" alt="Issue Photo" style="max-width: 100%; border-radius: 6px; border: 1px solid #ccc;">
+                    </div>
+                {% endif %}
+
+                {% if ticket.status != 'Done' %}
+                    <div class="action-area">
+                        {% if ticket.status|lower == 'assigned' %}
+                            <form action="{{ url_for('main.update_status', ticket_id=ticket.id) }}" method="POST" style="width: 100%;">
+                                <input type="hidden" name="status" value="In Progress">
+                                <button type="submit" class="btn-action btn-progress" style="width: 100%;">Mark 'In Progress'</button>
+                            </form>
+                        {% endif %}
+                        
+                        <form action="{{ url_for('main.update_status', ticket_id=ticket.id) }}" method="POST" style="width: 100%;">
+                            <input type="hidden" name="status" value="Done">
+                            
+                            {% if ticket.status|lower == 'assigned' %}
+                                <button type="button" class="btn-action" style="width: 100%; background-color: #ced4da; color: #6c757d; cursor: not-allowed;" disabled title="You must mark this 'In Progress' first!">Mark as 'Done'</button>
+                            {% else %}
+                                <button type="submit" class="btn-action btn-done" style="width: 100%;">Mark as 'Done'</button>
+                            {% endif %}
+                            
+                        </form>
+                    </div>
+                {% endif %}
+                <div style="margin-top: 20px; background: #f8f9fa; padding: 15px; border-radius: 6px;">
+                        <h4 style="margin: 0 0 15px 0; color: #333; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Ticket History</h4>
+                        
+                        <div style="border-left: 2px solid #ccc; padding-left: 15px; margin-left: 5px;">
+                            
+                            {% for log in ticket.logs|sort(attribute='timestamp') %}
+                                <div style="margin-bottom: 12px; position: relative;">
+                                    <span style="position: absolute; left: -21px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #007bff; border: 2px solid #f8f9fa;"></span>
+                                    
+                                    <div style="font-size: 11px; color: #888; font-weight: bold;">{{ log.timestamp.strftime('%B %d, %I:%M %p') }}</div>
+                                    <div style="font-size: 13px; color: #333;">{{ log.action }}</div>
+                                </div>
+                            {% endfor %}
+                            
+                        </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p style="text-align: center; color: #666; margin-top: 30px;">You have no assigned jobs right now. Take a break! ☕</p>
+    {% endif %}
+
+</div>
+
+</body>
+</html>

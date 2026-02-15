@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qwego PropTech - Smart Maintenance</title>
+    <style>
+        /* Pro-tip: This stops elements from growing wider than the screen */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background: linear-gradient(135deg, #f4f7f6 0%, #e0eafc 100%);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Navbar Styling */
+        nav { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 20px 5vw; 
+            background: white; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .logo { font-size: 24px; font-weight: bold; color: #007bff; text-decoration: none; letter-spacing: 1px;}
+        .nav-links { display: flex; gap: 15px; align-items: center; }
+        .nav-links a { text-decoration: none; color: #555; font-weight: 500; }
+        .nav-links a:hover { color: #007bff; }
+        .btn-nav { background: #007bff; color: white !important; padding: 8px 15px; border-radius: 4px; }
+
+        /* Hero Section Styling */
+        .hero { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            text-align: center; 
+            padding: 40px 20px; 
+        }
+        .hero h1 { font-size: 48px; font-weight: 800; margin-bottom: 20px; color: #222; max-width: 800px; line-height: 1.2; }
+        .hero h1 span { color: #007bff; }
+        .hero p { font-size: 18px; color: #555; max-width: 600px; margin-bottom: 40px; line-height: 1.6; }
+        
+        /* Buttons */
+        .btn-group { display: flex; gap: 20px; justify-content: center; width: 100%; max-width: 500px; }
+        .btn { padding: 15px 30px; border-radius: 8px; font-size: 16px; font-weight: bold; text-decoration: none; transition: all 0.3s ease; text-align: center; flex: 1; }
+        .btn-primary { background: #007bff; color: white; box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3); }
+        .btn-primary:hover { background: #0056b3; transform: translateY(-2px); }
+        .btn-outline { background: white; color: #007bff; border: 2px solid #007bff; }
+        .btn-outline:hover { background: #f8f9fa; transform: translateY(-2px); }
+
+        /* Simple Footer */
+        footer { text-align: center; padding: 20px; font-size: 14px; color: #888; }
+
+        /* --- MOBILE RESPONSIVE FIXES --- */
+        @media (max-width: 768px) {
+            nav { 
+                flex-direction: column; 
+                gap: 15px; 
+                padding: 15px 20px;
+            }
+            .hero h1 { 
+                font-size: 36px; /* Shrinks the giant text for phones */
+            }
+            .hero p {
+                font-size: 16px;
+            }
+            .btn-group { 
+                flex-direction: column; /* Stacks the buttons vertically */
+                gap: 15px;
+            }
+            .btn { 
+                width: 100%; /* Makes buttons full-width on mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="/" class="logo">🏢 PropTech</a>
+        <div class="nav-links">
+            <a href="{{ url_for('auth.login') }}">Log In</a>
+            <a href="{{ url_for('auth.register') }}" class="btn-nav">Sign Up Free</a>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <h1>Smart Property Maintenance, <span>Simplified.</span></h1>
+        <p>The all-in-one platform for property managers, tenants, and technicians. Report issues, assign jobs, and track progress in real-time.</p>
+        
+        <div class="btn-group">
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Get Started Now</a>
+            <a href="{{ url_for('auth.login') }}" class="btn btn-outline">Access Dashboard</a>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2026 PropTech Solutions. Built for seamless property management.
+    </footer>
+
+</body>
+</html>

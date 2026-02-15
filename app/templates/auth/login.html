@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Qwego PropTech</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        h2 { text-align: center; color: #333; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #666; }
+        input[type="text"], input[type="password"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background-color: #0056b3; }
+        .flash-messages { color: red; text-align: center; margin-bottom: 15px; }
+        
+        /* Demo Credentials Styling */
+        .demo-cards { margin-top: 25px; padding: 15px; background-color: #e9ecef; border-radius: 4px; font-size: 14px; }
+        .demo-cards h4 { margin-top: 0; margin-bottom: 10px; color: #333; }
+        .role-demo { margin-bottom: 10px; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+        .role-demo:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .role-demo strong { color: #007bff; }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h2>PropTech System</h2>
+        
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for message in messages %}
+                        {{ message }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('auth.login') }}">
+            <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" autocomplete="username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" autocomplete="current-password" required>
+            </div>
+            <button type="submit">Log In</button>
+            <div style="text-align: center; margin-top: 15px;">
+                <a href="{{ url_for('auth.forgot_password') }}" style="font-size: 14px; color: #007bff; text-decoration: none;">Forgot Password?</a>
+            </div>
+        </form>
+
+        <div class="demo-cards">
+            <h4>Demo Credentials</h4>
+            <div class="role-demo">
+                <strong>Manager:</strong> ID: <code>manager_demo</code> | Pass: <code>password123</code>
+            </div>
+            <div class="role-demo">
+                <strong>Tenant:</strong> ID: <code>tenant_demo</code> | Pass: <code>password123</code>
+            </div>
+            <div class="role-demo">
+                <strong>Technician:</strong> ID: <code>tech_demo</code> | Pass: <code>password123</code>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

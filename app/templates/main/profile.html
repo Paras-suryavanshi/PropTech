@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - PropTech</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 80vh; }
+        .profile-card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+        .avatar { width: 80px; height: 80px; background: #007bff; color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 32px; font-weight: bold; margin: 0 auto 15px auto; }
+        h2 { margin: 0; color: #333; }
+        .role-badge { display: inline-block; background: #e9ecef; color: #555; padding: 5px 12px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-top: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .info-group { text-align: left; margin-top: 25px; border-top: 1px solid #eee; padding-top: 15px; }
+        .info-label { font-size: 12px; color: #888; text-transform: uppercase; font-weight: bold; margin-bottom: 5px; }
+        .info-value { font-size: 16px; color: #333; margin-bottom: 15px; font-weight: 500; }
+        .btn-back { display: block; width: 100%; padding: 12px; background: #6c757d; color: white; text-decoration: none; border-radius: 4px; font-weight: bold; margin-top: 20px; box-sizing: border-box; }
+        .btn-back:hover { background: #5a6268; }
+    </style>
+</head>
+<body>
+
+<div class="profile-card">
+    <div class="avatar">{{ current_user.full_name[0] | upper }}</div>
+    
+    <h2>{{ current_user.full_name }}</h2>
+    <div class="role-badge">{{ current_user.role }}</div>
+
+    <div class="info-group">
+        <div class="info-label">Username</div>
+        <div class="info-value">@{{ current_user.username }}</div>
+
+        <div class="info-label">Email Address</div>
+        <div class="info-value">📧 {{ current_user.email }}</div>
+
+        <div class="info-label">Phone Number</div>
+        <div class="info-value">📞 {{ current_user.phone_number }}</div>
+    </div>
+
+    <a href="{{ url_for('main.dashboard') }}" class="btn-back">← Back to Dashboard</a>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tenant Dashboard - PropTech</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: auto; }
+        header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px;}
+        h1, h2 { color: #333; margin: 0; font-size: 20px; }
+        .btn-logout { background: #dc3545; color: white; padding: 14px 10px; text-decoration: none; border-radius: 10px; font-weight: bold; }
+        .btn-create { background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: bold; margin-bottom: 20px;}
+        
+        .ticket-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 15px; border-left: 5px solid #ccc; }
+        .ticket-card.status-Open { border-left-color: #dc3545; }
+        .ticket-card.status-Assigned { border-left-color: #ffc107; }
+        .ticket-card.status-In-Progress { border-left-color: #17a2b8; }
+        .ticket-card.status-Done { border-left-color: #28a745; }
+        
+        .ticket-header { display: flex; justify-content: space-between; margin-bottom: 10px; align-items: center;}
+        .ticket-title { font-weight: bold; font-size: 18px; color: #333; }
+        .ticket-date { font-size: 12px; color: #888; }
+        .badge { padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; background: #e9ecef; color: #06920d;}
+        .flash-messages { color: green; font-weight: bold; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Welcome, {{ current_user.full_name }}</h1>
+        <div style="display: flex; gap: 10px;">
+            <a href="{{ url_for('main.profile') }}" style="background: #54a1ef; color: #333; padding: 8px 15px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 14px;">My Profile</a>
+            <a href="{{ url_for('auth.logout') }}" class="btn-logout">Logout</a>
+        </div>
+    </header>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for message in messages %} {{ message }} {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <a href="{{ url_for('main.create_ticket') }}" class="btn-create">+ Report New Issue</a>
+    
+    {% if announcements %}
+        <div style="margin-bottom: 25px;">
+            <h3 style="color: #6f42c1; font-size: 16px; margin-bottom: 10px; text-transform: uppercase;">📢 Important Updates</h3>
+            {% for ann in announcements %}
+                <div style="background: #e0d4f5; border-left: 4px solid #6f42c1; padding: 15px; border-radius: 4px; margin-bottom: 10px; color: #333;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                        <strong style="font-size: 16px;">{{ ann.title }}</strong>
+                        <span style="font-size: 12px; color: #666;">{{ ann.created_at.strftime('%B %d, %I:%M %p') }}</span>
+                    </div>
+                    <p style="margin: 0; font-size: 14px; line-height: 1.5;">{{ ann.message }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <h2 style="margin-bottom: 10px;">My Maintenance Tickets</h2>
+    
+    {% if tickets %}
+        {% for ticket in tickets %}
+            <div class="ticket-card status-{{ ticket.status | replace(' ', '-') }}">
+                <div class="ticket-header">
+                    <div class="ticket-title">{{ ticket.title }}</div>
+                    <span class="badge">{{ ticket.status }}</span>
+                </div>
+                <div class="ticket-date">Reported on: {{ ticket.created_at.strftime('%B %d, %Y') }}</div>
+                <p style="color: #555; font-size: 14px; margin-top: 10px;">{{ ticket.description }}</p>
+                
+                {% if ticket.image_filename %}
+                    <span style="font-size: 12px; color: #007bff;">📎 Image Attached</span>
+                {% endif %}
+                <div style="margin-top: 20px; background: #f8f9fa; padding: 15px; border-radius: 6px;">
+                        <h4 style="margin: 0 0 15px 0; color: #333; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Ticket History</h4>
+                        
+                        <div style="border-left: 2px solid #ccc; padding-left: 15px; margin-left: 5px;">
+                            
+                            {% for log in ticket.logs|sort(attribute='timestamp') %}
+                                <div style="margin-bottom: 12px; position: relative;">
+                                    <span style="position: absolute; left: -21px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #007bff; border: 2px solid #f8f9fa;"></span>
+                                    
+                                    <div style="font-size: 11px; color: #888; font-weight: bold;">{{ log.timestamp.strftime('%B %d, %I:%M %p') }}</div>
+                                    <div style="font-size: 13px; color: #333;">{{ log.action }}</div>
+                                </div>
+                            {% endfor %}
+                            
+                        </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p style="color: #666; background: white; padding: 20px; border-radius: 8px;">You haven't reported any issues yet. Everything looks good!</p>
+    {% endif %}
+
+</div>
+
+</body>
+</html>

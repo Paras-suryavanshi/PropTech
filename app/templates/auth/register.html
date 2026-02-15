@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - PropTech</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
+        .register-container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 450px; }
+        
+        /* Judge Banner Styling */
+        .judge-banner { background-color: #e2f0fb; border-left: 4px solid #007bff; padding: 15px; margin-bottom: 25px; border-radius: 4px; font-size: 14px; color: #333; line-height: 1.5; }
+        .judge-banner a { color: #007bff; font-weight: bold; text-decoration: none; }
+        .judge-banner a:hover { text-decoration: underline; }
+
+        h2 { text-align: center; color: #333; margin-top: 0; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #666; font-weight: bold; font-size: 14px; }
+        input[type="text"], input[type="email"], input[type="tel"], input[type="password"], select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+        
+        button { width: 100%; padding: 12px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 10px; }
+        button:hover { background-color: #218838; }
+        .flash-messages { color: red; text-align: center; margin-bottom: 15px; font-weight: bold; }
+        .login-link { display: block; text-align: center; margin-top: 15px; font-size: 14px; color: #007bff; text-decoration: none; }
+        .login-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <div class="register-container">
+        
+        <div class="judge-banner">
+            <strong>NOTE: Welcome,</strong> We highly value your time.<br>
+            If you prefer to bypass the registration process, please <a href="{{ url_for('auth.login') }}">visit the Login page</a> to utilize our pre-configured demo accounts (Manager, Tenant, or Technician) for instant access to the platform's core features.
+        </div>
+
+        <h2>Create an Account</h2>
+        
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for message in messages %} {{ message }} {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('auth.register') }}">
+            <div class="form-group">
+                <label for="full_name">Full Name</label>
+                <input type="text" id="full_name" name="full_name" placeholder="John Doe" autocomplete="name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="johndoe123" autocomplete="username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="john@example.com" autocomplete="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone_number">Phone Number</label>
+                <input type="tel" id="phone_number" name="phone_number" placeholder="+1 234 567 8900" autocomplete="tel" required>
+            </div>
+
+            <div class="form-group">
+                <label for="role">I am a...</label>
+                <select id="role" name="role" required>
+                    <option value="" disabled selected>Select your role</option>
+                    <option value="tenant">Tenant (Reporting Issues)</option>
+                    <option value="technician">Technician (Fixing Issues)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" autocomplete="new-password" required>
+            </div>
+            
+            <button type="submit">Register Account</button>
+        </form>
+        
+        <a href="{{ url_for('auth.login') }}" class="login-link">Already have an account? Log In</a>
+    </div>
+
+</body>
+</html>
