@@ -1,11 +1,11 @@
-# 🏢 Qwego PropTech: Smart Property Maintenance 
+# 🏢 PropTech: Smart Property Maintenance 
 
 ![Python](https://img.shields.io/badge/Python-3.x-blue?style=for-the-badge&logo=python)
 ![Flask](https://img.shields.io/badge/Flask-Web%20Framework-black?style=for-the-badge&logo=flask)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-blue?style=for-the-badge&logo=postgresql)
 ![Mobile First](https://img.shields.io/badge/Design-Mobile%20First-success?style=for-the-badge)
 
-A full-stack, B2B SaaS platform designed to eliminate the chaos of property maintenance. Qwego connects Property Managers, Tenants, and Technicians through a secure, role-based, and strictly enforced workflow ecosystem.
+A full-stack, B2B SaaS platform designed to eliminate the chaos of property maintenance.PropTech connects Property Managers, Tenants, and Technicians through a secure, role-based, and strictly enforced workflow ecosystem.
 
 ---
 
@@ -13,10 +13,12 @@ A full-stack, B2B SaaS platform designed to eliminate the chaos of property main
 Property maintenance today is broken. Tenants send vague text messages ("the sink is leaking"), managers lose track of who was assigned to what, and technicians show up without knowing the full history of the issue. The result is delayed repairs, frustrated renters, and inefficient use of capital.
 
 ## 🧠 Our Approach & Methodology
-We approached this problem by focusing on **Data Strictness** and **Frictionless UX**. 
+I approached this problem by focusing on **Data Strictness** and **Frictionless UX**. 
+
 1. **Zero-Ambiguity Data:** Tenants *cannot* submit a ticket without photographic evidence. Technicians *cannot* mark a job as "Done" without first officially marking it "In Progress." We let the software enforce the rules so managers don't have to.
 2. **Tripartite Architecture:** We built three distinct dashboards tailored to the exact psychological needs of each user role. 
-3. **Mobile-First Reality:** Maintenance doesn't happen at a desk. We engineered a 100% responsive UI ensuring tenants can upload photos from their phones and technicians can update statuses from the field.
+3. **Secure Gatekeeping:** To protect tenant privacy and ensure quality control, technician accounts are completely sandboxed upon creation. A technician cannot view tickets or access their dashboard until a Manager explicitly verifies and approves their profile.
+4. **Mobile-First Reality:** Maintenance doesn't happen at a desk. We engineered a 100% responsive UI ensuring tenants can upload photos from their phones and technicians can update statuses from the field.
 
 ---
 
@@ -45,7 +47,7 @@ Our system operates on a seamless, traceable lifecycle:
 ---
 
 ## 🚀 Live Demo For Evaluators
-We value your time. You can completely bypass the registration and approval process by using our pre-configured demo accounts to test the application instantly:
+I value your time. You can completely bypass the registration and approval process by using my pre-configured demo accounts to test the application instantly:
 
 | Role | Username | Password | Key Actions to Test |
 | :--- | :--- | :--- | :--- |
@@ -65,37 +67,24 @@ We value your time. You can completely bypass the registration and approval proc
 
 ## 🔮 Future Scope
 While the current MVP solves the core operational bottleneck, our roadmap includes:
-1. **AI Triage & Routing:** Implementing machine learning to analyze the tenant's uploaded photo and automatically suggest the correct technician type (Plumber, Electrician, etc.).
+1. **AI Triage & Routing:** Implementing machine learning to analyze the tenant's issue title, description and uploaded photo and automatically suggest the correct technician type (Plumber, Electrician, etc.).
 2. **In-App Messaging:** Real-time, socket-based chat between the assigned technician and the tenant for gate codes or ETA updates.
 3. **Invoicing Integration:** Automated generation of PDF invoices sent to the manager the moment a technician marks a job as "Done."
 4. **IoT Integration:** Allowing smart building sensors (e.g., water leak detectors) to automatically generate high-priority API tickets without human intervention.
 
 ---
 
-## ⚙️ Local Setup Instructions
+# Local Setup Instructions
 
-1. **Clone the repository:**
-   `Bash`
-   git clone <your-repo-link>
-   cd <your-repo-folder>
+1. Clone the repository: Open your terminal and type git clone <your-repo-link>, then navigate into the folder by typing cd <your-repo-folder>.
 
-2. **Set up a virtual environment:**
+2. Set up a virtual environment: Type python -m venv venv to create the isolated environment. To activate it, type source venv/bin/activate (or use venv\Scripts\activate if you are on Windows).
 
-`Bash`
-python -m venv venv
-source venv/bin/activate  `# On Windows: venv\Scripts\activate`
+3. Install dependencies: Type pip install -r requirements.txt to install all required packages.
 
-3. **Install dependencies:**
-
-`Bash`
-pip install -r requirements.txt
-Configure Environment:
-Create a .env file in the root directory and add your database URI:
+4. Configure Environment: Create a file named .env in the root directory. Inside that file, add your database URI and secret key on separate lines, exactly like this:
 DATABASE_URL=postgresql://user:password@localhost:5432/proptech
 SECRET_KEY=your_secret_key
 
-4. **Run the Application:**
-
-`Bash`
-python run.py
+5. Run the Application: Type python run.py to start the server.
 (Note: The system will automatically detect an empty database and seed the demo accounts upon the first run).
